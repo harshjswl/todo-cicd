@@ -59,8 +59,16 @@ jobs:
         run: |
           cd todo-gitops/helm/todo-app
           sed -i 's/tag:.*/tag: latest/' values.yaml
+
           git config --global user.email "ci@github.com"
           git config --global user.name "github-actions"
+
           git add .
-          git commit -m "update image tag"
-          git push
+
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "update image tag"
+            git push
+          fi
+
