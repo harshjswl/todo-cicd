@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: todo-backend
+spec:
+  replicas: {{ .Values.backend.replicas }}
+  selector:
+    matchLabels:
+      app: todo-backend
+  template:
+    metadata:
+      labels:
+        app: todo-backend
+    spec:
+      containers:
+        - name: backend
+          image: {{ .Values.backend.image }}
+          ports:
+            - containerPort: {{ .Values.backend.port }}
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://postgres:{{ .Values.postgres.port }}/{{ .Values.postgres.db }}
+            - name: SPRING_DATASOURCE_USERNAME
+              value: {{ .Values.postgres.user }}
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: {{ .Values.postgres.password }}

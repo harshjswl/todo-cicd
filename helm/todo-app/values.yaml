@@ -1,0 +1,21 @@
+backend:
+  image: harshjswl/todo-backend:latest
+  replicas: 3
+  port: 8080
+
+frontend:
+  image: harshjswl/todo-frontend:latest
+  replicas: 1
+  port: 80
+
+postgres:
+  image: postgres:15
+  db: todo_db
+  user: postgres
+  password: postgres
+  port: 5432
+
+ingress:
+  enabled: true
+  frontendHost: todo.application.com
+  backendHost: api.todo.application.com
