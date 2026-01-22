@@ -1,0 +1,65 @@
+name: CI-CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Build backend
+        run: |
+          cd backend
+          mvn test package
+
+      - name: Build frontend
+        run: |
+          cd frontend
+          npm install
+          npm run build
+
+  docker-build-push:
+    needs: build-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login Docker
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+
+      - name: Build & push backend
+        run: |
+          docker build -t harshjswl/todo-backend:latest backend
+          docker push harshjswl/todo-backend:latest
+
+      - name: Build & push frontend
+        run: |
+          docker build -t harshjswl/todo-frontend:latest frontend
+          docker push harshjswl/todo-frontend:latest
+
+  update-helm:
+    needs: docker-build-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone GitOps repo
+        run: |
+          git clone https://oauth2:${{ secrets.REPO_TOKEN }}@gitlab.com/harshjswl/todo-gitops.git
+
+      - name: Update image tag
+        run: |
+          cd todo-gitops/helm/todo-app
+          sed -i 's/tag:.*/tag: latest/' values.yaml
+          git config --global user.email "ci@github.com"
+          git config --global user.name "github-actions"
+          git add .
+          git commit -m "update image tag"
+          git push
