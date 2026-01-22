@@ -17,9 +17,9 @@ jobs:
           distribution: "temurin"
 
       - name: Build backend
-  run: |
-    cd backend
-    mvn clean package -DskipTests
+        run: |
+          cd backend
+          mvn clean package -DskipTests
 
 
       - name: Build frontend
