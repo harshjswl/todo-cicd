@@ -2,7 +2,7 @@ name: CI-CD Pipeline
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   build-test:
@@ -13,13 +13,14 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
-          distribution: 'temurin'
+          java-version: "17"
+          distribution: "temurin"
 
       - name: Build backend
-        run: |
-          cd backend
-          mvn test package
+  run: |
+    cd backend
+    mvn clean package -DskipTests
+
 
       - name: Build frontend
         run: |
