@@ -1,6 +1,6 @@
 backend:
   image: harshjswl/todo-backend:latest
-  replicas: 3
+  replicas: 1
   port: 8080
 
 frontend:
